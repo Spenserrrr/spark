@@ -23,6 +23,9 @@ on:
   schedule:
     - cron: '0 23 */2 * *'
   workflow_dispatch:
+  # Fork CI config: run this check on PRs whose base is the `ci-macos` branch. Do not merge upstream.
+  pull_request:
+    branches: [ci-macos]
 
 jobs:
   run-build:
@@ -30,6 +33,5 @@ jobs:
       packages: write
     name: Run
     uses: ./.github/workflows/python_hosted_runner_test.yml
-    if: github.repository == 'apache/spark'
     with:
       os: macos-26
