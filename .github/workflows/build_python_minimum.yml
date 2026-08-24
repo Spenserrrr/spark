@@ -23,6 +23,9 @@ on:
   schedule:
     - cron: '0 9 */2 * *'
   workflow_dispatch:
+  # Fork CI config: run this check on PRs whose base is the `ci-mindep` branch. Do not merge upstream.
+  pull_request:
+    branches: [ci-mindep]
 
 jobs:
   run-build:
@@ -30,7 +33,6 @@ jobs:
       packages: write
     name: Run
     uses: ./.github/workflows/build_and_test.yml
-    if: github.repository == 'apache/spark'
     with:
       java: 17
       branch: master
