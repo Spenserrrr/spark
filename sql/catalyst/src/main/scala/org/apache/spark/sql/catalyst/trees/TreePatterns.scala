@@ -84,6 +84,7 @@ object TreePattern extends Enumeration  {
   val OR: Value = Value
   val OUTER_REFERENCE: Value = Value
   val PARAMETER: Value = Value
+  val PARSE_SQL: Value = Value
   val PIPE_EXPRESSION: Value = Value
   val PLAN_EXPRESSION: Value = Value
   val PYTHON_UDF: Value = Value
@@ -98,11 +99,13 @@ object TreePattern extends Enumeration  {
   val SESSION_WINDOW: Value = Value
   val SQL_FUNCTION_EXPRESSION: Value = Value
   val SQL_SCALAR_FUNCTION: Value = Value
+  val SUBTRACT_TIMESTAMPS: Value = Value
   val SUM: Value = Value
   val TEMP_RESOLVED_COLUMN: Value = Value
   val TIME_WINDOW: Value = Value
   val TIME_ZONE_AWARE_EXPRESSION: Value = Value
   val TRANSPILED_PYTHON_UDF: Value = Value
+  val TRANSPILED_UDF_PARAMETER: Value = Value
   val TRUE_OR_FALSE_LITERAL: Value = Value
   val USER_DEFINED_AGGREGATION: Value = Value
   val VARIANT_GET: Value = Value
