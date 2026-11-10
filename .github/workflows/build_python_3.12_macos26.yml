@@ -23,15 +23,60 @@ on:
   schedule:
     - cron: '0 23 */2 * *'
   workflow_dispatch:
+    inputs:
+      probe_only:
+        description: Run only the standalone PyArrow version probes
+        type: boolean
+        default: false
   # Fork CI config: run this check on PRs whose base is the `ci-macos` branch. Do not merge upstream.
   pull_request:
     branches: [ci-macos]
 
 jobs:
   run-build:
+    if: github.event_name != 'workflow_dispatch' || !inputs.probe_only
     permissions:
       packages: write
     name: Run
     uses: ./.github/workflows/python_hosted_runner_test.yml
     with:
       os: macos-26
+
+  probe-unsafe-casts:
+    name: PyArrow unsafe-cast probe (${{ matrix.pyarrow }})
+    runs-on: macos-26
+    strategy:
+      fail-fast: false
+      matrix:
+        pyarrow: [25.0.1, 26.0.0, 26.0.1]
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          architecture: arm64
+      - name: Install probe dependencies
+        run: python -m pip install 'numpy==2.5.4' 'pyarrow==${{ matrix.pyarrow }}'
+      - name: Probe unsafe casts without Spark
+        run: |
+          python - <<'PY'
+          import json
+          import platform
+          import sys
+
+          import numpy as np
+          import pyarrow as pa
+
+          print(json.dumps({
+              "python": sys.version.split()[0],
+              "machine": platform.machine(),
+              "pyarrow": pa.__version__,
+              "numpy": np.__version__,
+              "float32_uint16": pa.array(
+                  [0.0, 1.5, -1.5, None], type=pa.float32()
+              ).cast(pa.uint16(), safe=False).to_pylist(),
+              "float64_int32": pa.array(
+                  [float("inf"), float("-inf"), float("nan"), None],
+                  type=pa.float64(),
+              ).cast(pa.int32(), safe=False).to_pylist(),
+          }, indent=2))
+          PY
